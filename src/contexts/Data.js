@@ -107,46 +107,39 @@ export const StaffProvider = (props) => {
     });
 
     // Order data for funnel-pipeline
-    const orderedDisplayData = [];
+    const orderedDisplayData = { x: [], y: [] };
 
     for (let key in displayData) {
       if (key === 'enquiries') {
-        orderedDisplayData.push({
-          name: `${key} 100%`,
-          value: displayData[key],
-        });
+        orderedDisplayData.y.push(`${key} 100%`);
+        orderedDisplayData.x.push(displayData[key]);
       }
+
       if (key === 'qualifications') {
         const percentDiff =
           (displayData.qualifications / displayData.enquiries) * 100;
-        orderedDisplayData.push({
-          name: `${key} ${percentDiff.toFixed(2)}%`,
-          value: displayData[key],
-        });
+        orderedDisplayData.y.push(`${key} ${percentDiff.toFixed(2)}%`);
+        orderedDisplayData.x.push(displayData[key]);
       }
       if (key === 'quotes') {
         const percentDiff = (displayData.quotes / displayData.enquiries) * 100;
-        orderedDisplayData.push({
-          name: `${key} ${percentDiff.toFixed(2)}%`,
-          value: displayData[key],
-        });
+        orderedDisplayData.y.push(`${key} ${percentDiff.toFixed(2)}%`);
+        orderedDisplayData.x.push(displayData[key]);
       }
       if (key === 'proposals') {
         const percentDiff =
           (displayData.proposals / displayData.enquiries) * 100;
-        orderedDisplayData.push({
-          name: `${key} ${percentDiff.toFixed(2)}%`,
-          value: displayData[key],
-        });
+        orderedDisplayData.y.push(`${key} ${percentDiff.toFixed(2)}%`);
+        orderedDisplayData.x.push(displayData[key]);
       }
       if (key === 'orders') {
         const percentDiff = (displayData.orders / displayData.enquiries) * 100;
-        orderedDisplayData.push({
-          name: `${key} ${percentDiff.toFixed(2)}%`,
-          value: displayData[key],
-        });
+        orderedDisplayData.push(`${key} ${percentDiff.toFixed(2)}%`);
+        orderedDisplayData.push(displayData[key]);
       }
     }
+
+    console.log('orderedDisplayData:', orderedDisplayData);
 
     setDisplayData(orderedDisplayData);
   }

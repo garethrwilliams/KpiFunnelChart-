@@ -10,8 +10,8 @@ export default function Sidebar() {
   };
 
   return (
-    <aside class='w-64' aria-label='Sidebar'>
-      <div class='border border-red-400'>
+    <aside className='w-64' aria-label='Sidebar'>
+      <div className='border border-red-400'>
         <button className='hover:text-gray-400' onClick={handleSelection}>
           Company
         </button>
