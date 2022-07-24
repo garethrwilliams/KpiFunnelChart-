@@ -3,13 +3,11 @@ import { StaffContext } from '../contexts/Data';
 import { useState } from 'react';
 
 export default function Sidebar() {
-  const { staff, setDataQuery } = useContext(StaffContext);
+  const { staff, setDataQuery, compare } = useContext(StaffContext);
   const [openMenu, setOpenMenu] = useState(null);
 
   const handleTeamSelection = (e) => {
     e.preventDefault();
-
-    console.log(e.target.textContent);
 
     // Hide/show team members
     if (openMenu === parseInt(e.target.id)) {
@@ -19,15 +17,35 @@ export default function Sidebar() {
     }
 
     // Set data query
-    setDataQuery(e.target.textContent);
+    compare
+      ? setDataQuery((queryObj) => {
+          const newQueryObj = { ...queryObj };
+          newQueryObj.comparison = e.target.textContent;
+          return newQueryObj;
+        })
+      : setDataQuery((queryObj) => {
+          const newQueryObj = { ...queryObj };
+          newQueryObj.main = e.target.textContent;
+          return newQueryObj;
+        });
   };
 
   const handleIndividualSelection = (e) => {
-    setDataQuery(e.target.textContent);
+    compare
+      ? setDataQuery((queryObj) => {
+          const newQueryObj = { ...queryObj };
+          newQueryObj.comparison = e.target.textContent;
+          return newQueryObj;
+        })
+      : setDataQuery((queryObj) => {
+          const newQueryObj = { ...queryObj };
+          newQueryObj.main = e.target.textContent;
+          return newQueryObj;
+        });
   };
 
   return (
-    <aside className='w-64 h-96' aria-label='Sidebar'>
+    <aside className='w-64 h-96 mt-12' aria-label='Sidebar'>
       <div className='border border-red-400 pl-4'>
         <button className='hover:text-gray-400' onClick={handleTeamSelection}>
           Company
