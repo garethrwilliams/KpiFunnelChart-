@@ -9,10 +9,12 @@
     "axios": "^0.27.2",
     "flowbite": "^1.4.7",
     "flowbite-react": "^0.1.3",
+    "plotly.js": "^2.13.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-funnel-chart": "^0.1.8",
     "react-funnel-pipeline": "^0.1.2",
+    "react-plotly.js": "^2.5.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },

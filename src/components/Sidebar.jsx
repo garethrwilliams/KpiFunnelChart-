@@ -1,18 +1,35 @@
 import { useContext } from 'react';
 import { StaffContext } from '../contexts/Data';
+import { useState } from 'react';
 
 export default function Sidebar() {
   const { staff, setDataQuery } = useContext(StaffContext);
+  const [openMenu, setOpenMenu] = useState(null);
 
-  const handleSelection = (e) => {
+  const handleTeamSelection = (e) => {
     e.preventDefault();
+
+    console.log(e.target.textContent);
+
+    // Hide/show team members
+    if (openMenu === parseInt(e.target.id)) {
+      setOpenMenu(null);
+    } else {
+      setOpenMenu(e.target.textContent);
+    }
+
+    // Set data query
+    setDataQuery(e.target.textContent);
+  };
+
+  const handleIndividualSelection = (e) => {
     setDataQuery(e.target.textContent);
   };
 
   return (
-    <aside class='w-64' aria-label='Sidebar'>
-      <div class='border border-red-400'>
-        <button className='hover:text-gray-400' onClick={handleSelection}>
+    <aside className='w-64 h-96' aria-label='Sidebar'>
+      <div className='border border-red-400 pl-4'>
+        <button className='hover:text-gray-400' onClick={handleTeamSelection}>
           Company
         </button>
         {Object.keys(staff).map((team) => {
@@ -20,8 +37,9 @@ export default function Sidebar() {
             <div className='ml-6 my-4 flex flex-col'>
               <button
                 className='hover:text-gray-300 text-left'
-                onClick={handleSelection}
+                onClick={handleTeamSelection}
                 key={team}
+                id={team}
               >
                 {team ? team : 'Unassigned'}
               </button>
@@ -29,8 +47,10 @@ export default function Sidebar() {
               {staff[team].map((staff) => {
                 return (
                   <button
-                    className='ml-12 hover:text-gray-300 flex-col'
-                    onClick={handleSelection}
+                    className={`ml-12 hover:text-gray-300 flex-col ${
+                      openMenu === team ? 'visible' : 'hidden'
+                    }`}
+                    onClick={handleIndividualSelection}
                     key={staff}
                   >
                     {staff}
