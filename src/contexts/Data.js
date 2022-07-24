@@ -7,38 +7,36 @@ export const StaffContext = createContext();
 
 export const StaffProvider = (props) => {
   const [staff, setStaff] = useState({});
-  const [month, setMonth] = useState('2022-07');
+  const [month, setMonth] = useState(
+    new Date().toISOString().split('-').slice(0, 2).join('-')
+  );
   const [dataQuery, setDataQuery] = useState('Company');
-  const [displayData, setDisplayData] = useState();
-  const [kpiData, setKpiData] = useState('');
+  const [displayData, setDisplayData] = useState({ x: [], y: [] });
+  const [kpiData, setKpiData] = useState({});
+  console.log('displayData:', displayData);
 
   useEffect(() => {
-    getMonthData(month + '-01')
-      .then((data) => {
-        setKpiData(data);
+    // If the month hasn't been loaded then call API
 
-        if (!data.success) {
-          return setDisplayData('out of range');
-        }
-        const staffList = {};
+    if (!kpiData[month]) {
+      getMonthData(month + '-01').then((data) => {
+        // Add months data to data object
 
-        data.kpi.forEach((staffMember) => {
-          if (!staffList[staffMember.team]) {
-            staffList[staffMember.team] = [];
-          }
-
-          staffList[staffMember.team].push(
-            capitaliseFirstLetter(staffMember.assigned)
-          );
+        setKpiData((KpiObj) => {
+          const newKpiObj = { ...KpiObj };
+          newKpiObj[month] = data;
+          return newKpiObj;
         });
 
-        getDisplayData(dataQuery, data, staffList);
-        setStaff(staffList);
-      })
-      .then(() => {});
+        updateDisplayData(data);
+      });
+    } else {
+      // Else load from data object
+      updateDisplayData(kpiData[month]);
+    }
   }, [dataQuery, month]);
 
-  function getDisplayData(dataQuery, data, staffList) {
+  function getDisplayData(dataQuery, data) {
     const displayData = {
       enquiries: 0,
       qualifications: 0,
@@ -107,48 +105,36 @@ export const StaffProvider = (props) => {
     });
 
     // Order data for funnel-pipeline
-    const orderedDisplayData = [];
+    const orderedDisplayData = { x: [], y: [] };
 
     for (let key in displayData) {
-      if (key === 'enquiries') {
-        orderedDisplayData.push({
-          name: `${key} 100%`,
-          value: displayData[key],
-        });
-      }
-      if (key === 'qualifications') {
-        const percentDiff =
-          (displayData.qualifications / displayData.enquiries) * 100;
-        orderedDisplayData.push({
-          name: `${key} ${percentDiff.toFixed(2)}%`,
-          value: displayData[key],
-        });
-      }
-      if (key === 'quotes') {
-        const percentDiff = (displayData.quotes / displayData.enquiries) * 100;
-        orderedDisplayData.push({
-          name: `${key} ${percentDiff.toFixed(2)}%`,
-          value: displayData[key],
-        });
-      }
-      if (key === 'proposals') {
-        const percentDiff =
-          (displayData.proposals / displayData.enquiries) * 100;
-        orderedDisplayData.push({
-          name: `${key} ${percentDiff.toFixed(2)}%`,
-          value: displayData[key],
-        });
-      }
-      if (key === 'orders') {
-        const percentDiff = (displayData.orders / displayData.enquiries) * 100;
-        orderedDisplayData.push({
-          name: `${key} ${percentDiff.toFixed(2)}%`,
-          value: displayData[key],
-        });
-      }
+      orderedDisplayData.y.push(key);
+      orderedDisplayData.x.push(displayData[key]);
     }
 
     setDisplayData(orderedDisplayData);
+  }
+
+  function updateDisplayData(data) {
+    const staffList = {};
+
+    data.kpi.forEach((staffMember) => {
+      // Change '' to 'Unassigned' so that the data is correctly retrieved
+      if (staffMember.team === '') {
+        staffMember.team = 'Unassigned';
+      }
+
+      if (!staffList[staffMember.team]) {
+        staffList[staffMember.team] = [];
+      }
+
+      staffList[staffMember.team].push(
+        capitaliseFirstLetter(staffMember.assigned)
+      );
+    });
+
+    getDisplayData(dataQuery, data);
+    setStaff(staffList);
   }
 
   return (
