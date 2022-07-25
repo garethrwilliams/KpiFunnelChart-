@@ -26,15 +26,91 @@ export default function Funnel() {
     setCompare(!compare);
   }
 
-  console.log('dataQuery:', dataQuery);
+  function handleDateChange(e) {
+    function changeDateForward(dateStr) {
+      const dateArr = dateStr.split('-').map((e) => parseInt(e));
+      if (dateArr[1] === 12) {
+        dateArr[1] = 1;
+        dateArr[0]++;
+      } else {
+        dateArr[1]++;
+      }
+
+      return dateArr
+        .map((e) => {
+          let toString = e.toString();
+          if (toString.length === 1) {
+            toString = '0' + toString;
+          }
+          return toString;
+        })
+        .join('-');
+    }
+
+    function changeDateBackward(dateStr) {
+      const dateArr = dateStr.split('-').map((e) => parseInt(e));
+      if (dateArr[1] === 1) {
+        dateArr[1] = 12;
+        dateArr[0]--;
+      } else {
+        dateArr[1]--;
+      }
+
+      return dateArr
+        .map((e) => {
+          let toString = e.toString();
+          if (toString.length === 1) {
+            toString = '0' + toString;
+          }
+          return toString;
+        })
+        .join('-');
+    }
+
+    if (e.target.value) {
+      setMonth((monthObj) => {
+        const newMonthObj = { ...monthObj };
+        newMonthObj[compare ? 'comparison' : 'main'] = e.target.value;
+        return newMonthObj;
+      });
+    }
+
+    if (e.target.textContent === 'Next') {
+      setMonth((monthObj) => {
+        const newMonthObj = { ...monthObj };
+        newMonthObj[compare ? 'comparison' : 'main'] = changeDateForward(
+          compare ? month.comparison : month.main
+        );
+        return newMonthObj;
+      });
+    }
+
+    if (e.target.textContent === 'Previous') {
+      setMonth((monthObj) => {
+        const newMonthObj = { ...monthObj };
+        newMonthObj[compare ? 'comparison' : 'main'] = changeDateBackward(
+          compare ? month.comparison : month.main
+        );
+        return newMonthObj;
+      });
+    }
+  }
 
   return (
     <div className=' w-3/4 items-center px-6 py-12 '>
       <div className='border border-blue-600 text-center text-2xl  pl-36 md:pl-16'>
-        <h1>
-          Main: {dataQuery.main} <p> </p> Comparison:
-          {compare ? dataQuery.comparison : 'Target'}
-        </h1>
+        <div className='flex'>
+          <h1>Main: </h1>
+          <span className=' text-[#d7381e] pl-4 '>{dataQuery.main}</span>
+        </div>
+        <div className='flex'>
+          <h1>Comparison: </h1>
+          {compare ? (
+            <span className='text-[#1ebdd7] pl-4'>{dataQuery.comparison}</span>
+          ) : (
+            <span className='text-[#C5C6D0] pl-4'>Target</span>
+          )}
+        </div>
       </div>
       {displayData === 'out of range' ? (
         <h1 className='text-center'>No data available for selected month</h1>
@@ -48,16 +124,15 @@ export default function Funnel() {
                   y: displayData.y,
                   showlegend: false,
                   type: 'funnel',
-                  textposition: 'inside',
+                  textposition: 'auto',
                   textinfo: 'value+percent initial',
-                  hoverinfo: 'percent total+x',
                   opacity: 1,
                   marker: {
-                    color: ['59D4E8', 'DDB6C6', 'A696C8', '67EACA', '94D2E6'],
+                    color: ['d7381e', 'c1321b', 'd7381e', 'e2462d', 'e55a43'],
                   },
                   line: {
                     width: [4, 2, 2, 3, 1, 1],
-                    color: ['3E4E88', '606470', '3E4E88', '606470', '3E4E88'],
+                    color: ['3E4E88', '606470', '3E4E88', '606470', '606470'],
                   },
                   connector: {
                     line: { color: 'gray', width: 1 },
@@ -88,15 +163,14 @@ export default function Funnel() {
                     showlegend: false,
                     type: 'funnel',
                     textposition: 'none',
-                    hoverinfo: 'none',
-                    hovertemplate: 'Target %{x}%',
-                    opacity: 0.5,
+                    hoverinfo: 'value+percent initial',
+                    opacity: 1,
                     marker: {
-                      color: ['C5C6D0', 'C5C6D0', 'C5C6D0', 'C5C6D0', 'C5C6D0'],
+                      color: ['1ebdd7', '1ebdd7', '1ebdd7', '1ebdd7', '1ebdd7'],
                     },
                     line: {
                       width: [4, 2, 2, 3, 1, 1],
-                      color: ['C5C6D0', 'C5C6D0', 'C5C6D0', 'C5C6D0', 'C5C6D0'],
+                      color: ['3E4E88', '606470', '3E4E88', '606470', '3E4E88'],
                     },
                     connector: {
                       line: { color: ' gray', width: 1 },
@@ -106,27 +180,13 @@ export default function Funnel() {
                 ]}
                 layout={{
                   margin: { l: 150, t: 30, b: 10, r: 80 },
+                  pad: { r: 200 },
                   width: 600,
                   height: 400,
                   xaxis: { fixedrange: true },
                   yaxis: { fixedrange: true },
                 }}
                 config={{ displayModeBar: false }}
-                o
-
-                // annotations={[
-                //   {
-                //     x: 100,
-                //     y: displayData.y[0],
-                //     xref: 'x',
-                //     yref: 'y',
-                //     text: 'Annotation A',
-                //     showarrow: true,
-                //     arrowhead: 3,
-                //     ax: -30,
-                //     ay: -40,
-                //   },
-                // ]}
               />
             </div>
           ) : (
@@ -163,39 +223,45 @@ export default function Funnel() {
                   yaxis: { fixedrange: true },
                 }}
                 config={{ displayModeBar: false }}
-                o
-
-                // annotations={[
-                //   {
-                //     x: 100,
-                //     y: displayData.y[0],
-                //     xref: 'x',
-                //     yref: 'y',
-                //     text: 'Annotation A',
-                //     showarrow: true,
-                //     arrowhead: 3,
-                //     ax: -30,
-                //     ay: -40,
-                //   },
-                // ]}
               />
             </div>
           )}
-          <div className=' h-[406px] w-[600px]'></div>
+          <div className='absolute left-0 right-0 ml-auto mr-auto w-[600px]'>
+            <div className=' bg-[#f59385] h-[10px] w-[10px] right-[60px] top-[38px] absolute'></div>
+            <p className='-right-[15px] top-[30px] absolute'>{month.main}</p>
+            <div className=' bg-[#85bff5] h-[10px] w-[10px] right-[60px] top-[68px] absolute'></div>
+            <p className='-right-[15px] top-[60px] absolute'>
+              {month.comparison}
+            </p>
+          </div>
+          <div className=' h-[406px]'></div>
         </div>
       )}
-      <div className='my-16 text-center border border-fuchsia-600 '>
-        <label>Month: </label>
+      <div className='my-16 text-center border border-fuchsia-600 pl-28 '>
+        <button onClick={handleDateChange}>Previous</button>
         <input
           type='month'
           min='2018-01'
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
+          value={compare ? month.comparison : month.main}
+          onChange={handleDateChange}
           max={new Date().toISOString().split('-').slice(0, 2).join('-')}
+          className='mx-4'
         />
+        <button
+          onClick={handleDateChange}
+          disabled={
+            compare
+              ? month.comparison ===
+                new Date().toISOString().split('-').slice(0, 2).join('-')
+              : month.main ===
+                new Date().toISOString().split('-').slice(0, 2).join('-')
+          }
+        >
+          Next
+        </button>
       </div>
       <div
-        className={`my-16 text-center border border-teal-400 ${
+        className={`my-16 text-center border pl-24 border-teal-400 ${
           compare ? 'bg-slate-500' : ''
         }`}
       >

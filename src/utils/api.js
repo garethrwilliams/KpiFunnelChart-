@@ -8,6 +8,7 @@ const KpiApi = axios.create({
 export const getMonthData = async (month) => {
   try {
     const { data } = await KpiApi.get('', { params: { inmonth: month } });
+    console.log('data:', data);
     return data;
   } catch (err) {
     console.log('err:', err);

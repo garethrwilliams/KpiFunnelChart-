@@ -7,9 +7,10 @@ export const StaffContext = createContext();
 
 export const StaffProvider = (props) => {
   const [staff, setStaff] = useState({});
-  const [month, setMonth] = useState(
-    new Date().toISOString().split('-').slice(0, 2).join('-')
-  );
+  const [month, setMonth] = useState({
+    main: new Date().toISOString().split('-').slice(0, 2).join('-'),
+    comparison: new Date().toISOString().split('-').slice(0, 2).join('-'),
+  });
   const [dataQuery, setDataQuery] = useState({
     main: 'Company',
     comparison: 'Company',
@@ -21,7 +22,8 @@ export const StaffProvider = (props) => {
   });
   const [kpiData, setKpiData] = useState({});
   const [compare, setCompare] = useState(false);
-  console.log('displayDataCompare:', displayDataCompare);
+
+  console.log('kpiData:', kpiData);
 
   useEffect(() => {
     function updateDisplayData(data) {
@@ -47,71 +49,70 @@ export const StaffProvider = (props) => {
     }
 
     function getDisplayData(dataQuery, data) {
-      console.log('dataQuery:', dataQuery);
       const displayData = {
-        enquiries: 0,
-        qualifications: 0,
-        quotes: 0,
-        proposals: 0,
-        orders: 0,
+        Enquiries: 0,
+        Qualifications: 0,
+        Quotes: 0,
+        Proposals: 0,
+        Orders: 0,
       };
 
       data.kpi.forEach((item) => {
         if (dataQuery === 'Company') {
           // Add enquires
-          displayData.enquiries += parseInt(item.penquiry);
-          displayData.enquiries += parseInt(item.wenquiry);
-          displayData.enquiries += parseInt(item.oenquiry);
+          displayData.Enquiries += parseInt(item.penquiry);
+          displayData.Enquiries += parseInt(item.wenquiry);
+          displayData.Enquiries += parseInt(item.oenquiry);
 
           // Qualifications
-          displayData.qualifications += parseInt(item.qualifications);
+          displayData.Qualifications += parseInt(item.qualifications);
 
           // Quotes
-          displayData.quotes += parseInt(item.quotes);
+          displayData.Quotes += parseInt(item.quotes);
 
           // Proposals
-          displayData.proposals += parseInt(item.proposals);
+          displayData.Proposals += parseInt(item.proposals);
 
           // Orders
-          displayData.orders += parseInt(item.enqorders);
+          displayData.Orders += parseInt(item.enqorders);
         }
 
         if (item.team === dataQuery) {
           // Add enquires
-          displayData.enquiries += parseInt(item.penquiry);
-          displayData.enquiries += parseInt(item.wenquiry);
-          displayData.enquiries += parseInt(item.oenquiry);
+          displayData.Enquiries += parseInt(item.penquiry);
+          displayData.Enquiries += parseInt(item.wenquiry);
+          displayData.Enquiries += parseInt(item.oenquiry);
 
           // Qualifications
-          displayData.qualifications += parseInt(item.qualifications);
+          displayData.Qualifications += parseInt(item.qualifications);
 
           // Quotes
-          displayData.quotes += parseInt(item.quotes);
+          displayData.Quotes += parseInt(item.quotes);
 
           // Proposals
-          displayData.proposals += parseInt(item.proposals);
+          displayData.Proposals += parseInt(item.proposals);
 
           // Orders
-          displayData.orders += parseInt(item.enqorders);
+          displayData.Orders += parseInt(item.enqorders);
         }
 
         if (capitaliseFirstLetter(item.assigned) === dataQuery) {
           // Add enquires
-          displayData.enquiries += parseInt(item.penquiry);
-          displayData.enquiries += parseInt(item.wenquiry);
-          displayData.enquiries += parseInt(item.oenquiry);
+          displayData.Enquiries += parseInt(item.penquiry);
+          displayData.Enquiries += parseInt(item.wenquiry);
+          displayData.Enquiries += parseInt(item.oenquiry);
 
           // Qualifications
-          displayData.qualifications += parseInt(item.qualifications);
+          displayData.Qualifications += parseInt(item.qualifications);
 
           // Quotes
-          displayData.quotes += parseInt(item.quotes);
+          displayData.Quotes += parseInt(item.quotes);
 
           // Proposals
-          displayData.proposals += parseInt(item.proposals);
+          displayData.Proposals += parseInt(item.proposals);
 
           // Orders
-          displayData.orders += parseInt(item.enqorders);
+          displayData.Orders += parseInt(item.enqorders);
         }
       });
 
@@ -129,20 +130,22 @@ export const StaffProvider = (props) => {
     }
 
     // If the month hasn't been loaded then call API
-    if (!kpiData[month]) {
-      getMonthData(month + '-01').then((data) => {
-        // Add months data to data object
-        setKpiData((KpiObj) => {
-          const newKpiObj = { ...KpiObj };
-          newKpiObj[month] = data;
-          return newKpiObj;
-        });
+    if (!kpiData[compare ? month.comparison : month.main]) {
+      getMonthData((compare ? month.comparison : month.main) + '-01').then(
+        (data) => {
+          // Add months data to data object
+          setKpiData((KpiObj) => {
+            const newKpiObj = { ...KpiObj };
+            newKpiObj[compare ? month.comparison : month.main] = data;
+            return newKpiObj;
+          });
 
-        updateDisplayData(data);
-      });
+          updateDisplayData(data);
+        }
+      );
     } else {
       // Else load from data object
-      updateDisplayData(kpiData[month]);
+      updateDisplayData(kpiData[compare ? month.comparison : month.main]);
     }
   }, [dataQuery, month, kpiData, compare]);
 
